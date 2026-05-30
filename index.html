@@ -9616,7 +9616,7 @@ async function syncToCloud() {
     const idx = projects.findIndex(p => p.id === currentProjectId);
     if (idx > -1) projects[idx] = { ...state, id: currentProjectId };
 
-    const hasRealData = projects.some(p => ITEM_TYPES.some(t => (p[t]?.length || 0) > 0));
+    const hasRealData = projects.some(p => ITEM_TYPES.filter(t => t !== 'budgetKat').some(t => (p[t]?.length || 0) > 0));
     if (hasRealData) _saveLocalBackup(projects);
 
     const ts = new Date().toISOString();
@@ -9753,7 +9753,7 @@ async function loadFromCloud() {
     // Old format: projektdaten.daten.projects had full arrays.
     // Detect by: no rows in projekt_items but projektdaten has items.
     const oldFormatHasItems = !itemsHaveData && cloudMeta?.projects?.some(p =>
-      ITEM_TYPES.some(t => (p[t]?.length || 0) > 0)
+      ITEM_TYPES.filter(t => t !== 'budgetKat').some(t => (p[t]?.length || 0) > 0)
     );
     if (oldFormatHasItems) {
       console.log('Migrating from old format to projekt_items…');
@@ -9774,7 +9774,7 @@ async function loadFromCloud() {
     // ── Reconstruct projects from item rows ────────────────────────
     const _hasData = (arr) => Array.isArray(arr) && arr.length > 0 && arr.some(p =>
       (p.settings?.name && p.settings.name !== 'Neues Projekt') ||
-      ITEM_TYPES.some(t => (p[t]?.length || 0) > 0)
+      ITEM_TYPES.filter(t => t !== 'budgetKat').some(t => (p[t]?.length || 0) > 0)
     );
 
     let finalProjects;
